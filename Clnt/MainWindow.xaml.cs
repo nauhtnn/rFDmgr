@@ -26,6 +26,8 @@ namespace Clnt
             InitializeComponent();
         }
 
+        int prefx = 0;
+
         private void btnDir_Click(object sender, RoutedEventArgs e)
         {
             string path = tbxPath.Text;
@@ -37,7 +39,9 @@ namespace Clnt
             else if (Directory.Exists(path))
             {
                 // This path is a directory
-                ProcessDirectory(path);
+                //ProcessDirectory(path);
+                prefx = path.Length;
+                enumerateD(path);
             }
             else
             {
@@ -65,6 +69,17 @@ namespace Clnt
         public static void ProcessFile(string path)
         {
             Console.WriteLine("Processed file '{0}'.", path);
+        }
+
+        public void enumerateD(string d)
+        {
+            if (!Directory.Exists(d))
+                return;
+            foreach (string s in Directory.EnumerateDirectories(d))
+            {
+                Console.WriteLine(s.Substring(prefx));
+                enumerateD(s);
+            }
         }
     }
 }
