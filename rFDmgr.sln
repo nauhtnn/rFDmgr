@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rFDmgr", "rFDmgr\rFDmgr.csproj", "{E2A021F8-484A-4587-9278-2A32DC057EAE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clnt", "Clnt\Clnt.csproj", "{F3653007-6B70-4350-BB92-177A1E4EA8FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DsktopRec", "DsktopRec\DsktopRec.csproj", "{B49AA0D0-42CC-48D4-A413-3A7DD0981B69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFirstService", "MyFirstService\MyFirstService.csproj", "{13AE3E4A-35CD-45F9-9AB4-B142EF8E900A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{F3653007-6B70-4350-BB92-177A1E4EA8FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3653007-6B70-4350-BB92-177A1E4EA8FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3653007-6B70-4350-BB92-177A1E4EA8FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B49AA0D0-42CC-48D4-A413-3A7DD0981B69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B49AA0D0-42CC-48D4-A413-3A7DD0981B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B49AA0D0-42CC-48D4-A413-3A7DD0981B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B49AA0D0-42CC-48D4-A413-3A7DD0981B69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13AE3E4A-35CD-45F9-9AB4-B142EF8E900A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13AE3E4A-35CD-45F9-9AB4-B142EF8E900A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13AE3E4A-35CD-45F9-9AB4-B142EF8E900A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13AE3E4A-35CD-45F9-9AB4-B142EF8E900A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

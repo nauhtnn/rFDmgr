@@ -1,32 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Drawing;
-using System.Windows.Forms;
 
-namespace DsktopRec
+namespace DtRec
 {
-    class Program
+    public partial class Service1 : ServiceBase
     {
 
-        System.Timers.Timer timer = new System.Timers.Timer();
-
-        static void Main(string[] args)
+        Timer timer = new Timer();
+        public Service1()
         {
-            Program p = new Program();
-            p.OnStart(null);
+            InitializeComponent();
         }
 
         int Counter = 0;
         bool IsError = false;
 
-        string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        //string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        string SavDir { get { return "C:\\DtRec\\"; } }
 
         void InitCounter()
         {
-            System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe start");
+            //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe start");
+            System.IO.File.WriteAllText("C:\\DtReLog.txt", "DtRe start");
             IsError = false;
             if (!System.IO.Directory.Exists(SavDir))
             {
@@ -37,7 +42,8 @@ namespace DsktopRec
                 catch (Exception e)
                 {
                     IsError = true;
-                    System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", e.ToString());
+                    //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", e.ToString());
+                    System.IO.File.WriteAllText("C:\\DtReErr.txt", e.ToString());
                 }
             }
             if (IsError)
@@ -49,21 +55,22 @@ namespace DsktopRec
             }
         }
 
-        protected void OnStart(string[] args)
+        protected override void OnStart(string[] args)
         {
             InitCounter();
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(OnElapsedTime);
+            timer.Elapsed += new ElapsedEventHandler(OnElapsedTime);
             timer.Interval = 60000;
             timer.AutoReset = true;
             timer.Enabled = true;
         }
 
-        protected void OnStop()
+        protected override void OnStop()
         {
-            System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe stop");
+            //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe stop");
+            System.IO.File.WriteAllText("C:\\DtReLog.txt", "DtRe stop");
         }
 
-        private void OnElapsedTime(object source, System.Timers.ElapsedEventArgs e)
+        private void OnElapsedTime(object source, ElapsedEventArgs e)
         {
             if (IsError)
             {
@@ -86,7 +93,8 @@ namespace DsktopRec
                     catch (System.ComponentModel.Win32Exception ex)
                     {
                         IsError = true;
-                        System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                        //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                        System.IO.File.WriteAllText("C:\\DtReErr.txt", ex.ToString());
                     }
                 }
                 try
@@ -96,7 +104,8 @@ namespace DsktopRec
                 catch (System.Runtime.InteropServices.ExternalException ex)
                 {
                     IsError = true;
-                    System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                    //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                    System.IO.File.WriteAllText("C:\\DtReErr.txt", ex.ToString());
                 }
                 ++Counter;
             }
