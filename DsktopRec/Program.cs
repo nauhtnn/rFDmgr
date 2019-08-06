@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -10,23 +9,24 @@ namespace DsktopRec
 {
     class Program
     {
-
-        System.Timers.Timer timer = new System.Timers.Timer();
-
         static void Main(string[] args)
         {
             Program p = new Program();
-            p.OnStart(null);
+            p.InitCounter();
+			while(!p.IsError)
+			{
+				p.Rec();
+				System.Threading.Thread.Sleep(60000);
+			}
         }
 
         int Counter = 0;
-        bool IsError = false;
+        public bool IsError { get; private set; }
 
         string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
 
         void InitCounter()
         {
-            System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe start");
             IsError = false;
             if (!System.IO.Directory.Exists(SavDir))
             {
@@ -37,39 +37,18 @@ namespace DsktopRec
                 catch (Exception e)
                 {
                     IsError = true;
-                    System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", e.ToString());
+					return;
                 }
             }
-            if (IsError)
-                return;
             Counter = 0;
             while (System.IO.File.Exists(SavDir + Counter + ".bmp"))
-            {
                 ++Counter;
-            }
         }
 
-        protected void OnStart(string[] args)
+        private void Rec()
         {
-            InitCounter();
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(OnElapsedTime);
-            timer.Interval = 60000;
-            timer.AutoReset = true;
-            timer.Enabled = true;
-        }
-
-        protected void OnStop()
-        {
-            System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe stop");
-        }
-
-        private void OnElapsedTime(object source, System.Timers.ElapsedEventArgs e)
-        {
-            if (IsError)
-            {
-                timer.Enabled = false;
-                return;
-            }
+			if(IsError)
+				return;
             using (Bitmap bmpScreenCapture = new Bitmap(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width,
                                             System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height))
             {
@@ -86,7 +65,7 @@ namespace DsktopRec
                     catch (System.ComponentModel.Win32Exception ex)
                     {
                         IsError = true;
-                        System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                        return;
                     }
                 }
                 try
@@ -96,7 +75,7 @@ namespace DsktopRec
                 catch (System.Runtime.InteropServices.ExternalException ex)
                 {
                     IsError = true;
-                    System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
+                    return;
                 }
                 ++Counter;
             }
