@@ -22,93 +22,72 @@ namespace DtRec
             InitializeComponent();
         }
 
-        int Counter = 0;
-        bool IsError = false;
+        int Counter = -1;
 
         //string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
         string SavDir { get { return "C:\\DtRec\\"; } }
 
-        void InitCounter()
-        {
-            //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe start");
-            System.IO.File.WriteAllText("C:\\DtReLog.txt", "DtRe start");
-            IsError = false;
-            if (!System.IO.Directory.Exists(SavDir))
-            {
-                try
-                {
-                    System.IO.Directory.CreateDirectory(SavDir);
-                }
-                catch (Exception e)
-                {
-                    IsError = true;
-                    //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", e.ToString());
-                    System.IO.File.WriteAllText("C:\\DtReErr.txt", e.ToString());
-                }
-            }
-            if (IsError)
-                return;
-            Counter = 0;
-            while (System.IO.File.Exists(SavDir + Counter + ".bmp"))
-            {
-                ++Counter;
-            }
-        }
-
         protected override void OnStart(string[] args)
         {
-            InitCounter();
             timer.Elapsed += new ElapsedEventHandler(OnElapsedTime);
-            timer.Interval = 60000;
+            timer.Interval = 1000;
             timer.AutoReset = true;
-            timer.Enabled = true;
+            timer.Start();
+        }
+
+        void InitCounter()
+        {
+            Counter = 0;
+            while (System.IO.File.Exists(SavDir + Counter + ".bmp"))
+                ++Counter;
         }
 
         protected override void OnStop()
         {
-            //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReLog.txt", "DtRe stop");
-            System.IO.File.WriteAllText("C:\\DtReLog.txt", "DtRe stop");
         }
 
         private void OnElapsedTime(object source, ElapsedEventArgs e)
         {
-            if (IsError)
+            if (File.Exists(SavDir + "DtRec.exe"))
             {
-                timer.Enabled = false;
-                return;
-            }
-            using (Bitmap bmpScreenCapture = new Bitmap(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width,
-                                            System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height))
-            {
-                using (Graphics g = Graphics.FromImage(bmpScreenCapture))
-                {
-                    try
-                    {
-                        g.CopyFromScreen(System.Windows.Forms.Screen.PrimaryScreen.Bounds.X,
-                                     System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y,
-                                     0, 0,
-                                     bmpScreenCapture.Size,
-                                     CopyPixelOperation.SourceCopy);
-                    }
-                    catch (System.ComponentModel.Win32Exception ex)
-                    {
-                        IsError = true;
-                        //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
-                        System.IO.File.WriteAllText("C:\\DtReErr.txt", ex.ToString());
-                    }
-                }
+                if (Counter < 0)
+                    InitCounter();
                 try
                 {
-                    bmpScreenCapture.Save(SavDir + Counter + ".bmp");
+                    using (System.Diagnostics.Process pProcess = new System.Diagnostics.Process())
+                    {
+                        pProcess.StartInfo.FileName = SavDir + "DtRec.exe";
+                        pProcess.StartInfo.Arguments = Counter.ToString();
+                        ++Counter;
+                        pProcess.StartInfo.UseShellExecute = false;
+                        pProcess.StartInfo.RedirectStandardOutput = true;
+                        pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                        pProcess.StartInfo.CreateNoWindow = true; //not diplay a windows
+                        pProcess.Start();
+                        string errorCode = pProcess.StandardOutput.ReadToEnd(); //The output result
+                        pProcess.WaitForExit();
+                        if (int.Parse(errorCode) != 0)
+                            StopPlease();
+                    }
                 }
-                catch (System.Runtime.InteropServices.ExternalException ex)
+                catch(Exception ex)
                 {
-                    IsError = true;
-                    //System.IO.File.WriteAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtReErr.txt", ex.ToString());
-                    System.IO.File.WriteAllText("C:\\DtReErr.txt", ex.ToString());
+                    StreamWriter s = System.IO.File.AppendText("c:\\dtrec.txt");
+                    s.Write(ex.ToString());
+                    s.Close();
+                    StopPlease();
                 }
-                ++Counter;
             }
+            else
+            {
+                StopPlease();
+            }
+        }
+
+        void StopPlease()
+        {
+            timer.Stop();
+            Stop();
         }
     }
 }

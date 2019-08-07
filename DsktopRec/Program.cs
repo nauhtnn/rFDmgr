@@ -5,27 +5,48 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace DsktopRec
+namespace DtRec
 {
     class Program
     {
         static void Main(string[] args)
         {
             Program p = new Program();
-            p.InitCounter();
-			while(!p.IsError)
-			{
-				p.Rec();
-				System.Threading.Thread.Sleep(60000);
-			}
+            //Console.WriteLine(args == null);
+            //Console.WriteLine(args.Length);
+            //foreach (string i in args)
+            //    Console.WriteLine(i);
+            p.Init();
+            if (args == null || args.Length == 0)
+            {
+                p.Counter = 0;
+                while (System.IO.File.Exists(p.SavDir + p.Counter + ".bmp"))
+                    ++p.Counter;
+                while (!p.IsError)
+                {
+                    p.Rec(p.Counter);
+                    ++p.Counter;
+                    System.Threading.Thread.Sleep(60000);
+                }
+                Console.Write(1);
+            }
+            else
+            {
+                p.Rec(int.Parse(args[0]));
+                if (p.IsError)
+                    Console.Write(1);
+                else
+                    Console.Write(0);
+            }
         }
 
-        int Counter = 0;
+        public int Counter = 0;
         public bool IsError { get; private set; }
 
-        string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        //string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        string SavDir { get { return "C:\\DtRec\\"; } }
 
-        void InitCounter()
+        void Init()
         {
             IsError = false;
             if (!System.IO.Directory.Exists(SavDir))
@@ -34,18 +55,15 @@ namespace DsktopRec
                 {
                     System.IO.Directory.CreateDirectory(SavDir);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     IsError = true;
 					return;
                 }
             }
-            Counter = 0;
-            while (System.IO.File.Exists(SavDir + Counter + ".bmp"))
-                ++Counter;
         }
 
-        private void Rec()
+        private void Rec(int idx)
         {
 			if(IsError)
 				return;
@@ -65,19 +83,24 @@ namespace DsktopRec
                     catch (System.ComponentModel.Win32Exception ex)
                     {
                         IsError = true;
+                        System.IO.StreamWriter s = System.IO.File.AppendText("c:\\dtrec.txt");
+                        s.Write(ex.ToString());
+                        s.Close();
                         return;
                     }
                 }
                 try
                 {
-                    bmpScreenCapture.Save(SavDir + Counter + ".bmp");
+                    bmpScreenCapture.Save(SavDir + idx + ".bmp");
                 }
                 catch (System.Runtime.InteropServices.ExternalException ex)
                 {
                     IsError = true;
+                    System.IO.StreamWriter s = System.IO.File.AppendText("c:\\dtrec.txt");
+                    s.Write(ex.ToString());
+                    s.Close();
                     return;
                 }
-                ++Counter;
             }
         }
     }
