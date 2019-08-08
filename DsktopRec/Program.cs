@@ -15,7 +15,7 @@ namespace DtRec
             Program p = new Program();
             p.Init();
 			p.Counter = 0;
-			while (System.IO.File.Exists(p.SavDir + p.Counter + ".bmp"))
+			while (System.IO.File.Exists(p.SavDir + p.Counter + ".jpg"))
 				++p.Counter;
 			while (!p.IsError)
 			{
@@ -29,16 +29,17 @@ namespace DtRec
         public int Counter = 0;
         public bool IsError { get; private set; }
 
-        string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        string ExeDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
+        string SavDir { get { return System.IO.Path.GetTempPath() + "DtRec\\"; } }
 
         void Init()
         {
             IsError = false;
-            if (!System.IO.Directory.Exists(SavDir))
+            if (!Directory.Exists(SavDir))
             {
                 try
                 {
-                    System.IO.Directory.CreateDirectory(SavDir);
+                    Directory.CreateDirectory(SavDir);
                 }
                 catch (Exception)
                 {
