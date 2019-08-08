@@ -12,39 +12,23 @@ namespace DtRec
         static void Main(string[] args)
         {
             Program p = new Program();
-            //Console.WriteLine(args == null);
-            //Console.WriteLine(args.Length);
-            //foreach (string i in args)
-            //    Console.WriteLine(i);
             p.Init();
-            if (args == null || args.Length == 0)
-            {
-                p.Counter = 0;
-                while (System.IO.File.Exists(p.SavDir + p.Counter + ".bmp"))
-                    ++p.Counter;
-                while (!p.IsError)
-                {
-                    p.Rec(p.Counter);
-                    ++p.Counter;
-                    System.Threading.Thread.Sleep(60000);
-                }
-                Console.Write(1);
-            }
-            else
-            {
-                p.Rec(int.Parse(args[0]));
-                if (p.IsError)
-                    Console.Write(1);
-                else
-                    Console.Write(0);
+			p.Counter = 0;
+			while (System.IO.File.Exists(p.SavDir + p.Counter + ".bmp"))
+				++p.Counter;
+			while (!p.IsError)
+			{
+				p.Rec(p.Counter);
+				if(1440 < ++p.Counter)
+					p.Counter = 0;
+				System.Threading.Thread.Sleep(60000);
             }
         }
 
         public int Counter = 0;
         public bool IsError { get; private set; }
 
-        //string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
-        string SavDir { get { return "C:\\DtRec\\"; } }
+        string SavDir { get { return System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DtRec\\"; } }
 
         void Init()
         {
@@ -58,7 +42,6 @@ namespace DtRec
                 catch (Exception)
                 {
                     IsError = true;
-					return;
                 }
             }
         }
@@ -80,12 +63,9 @@ namespace DtRec
                                      bmpScreenCapture.Size,
                                      CopyPixelOperation.SourceCopy);
                     }
-                    catch (System.ComponentModel.Win32Exception ex)
+                    catch (System.ComponentModel.Win32Exception)
                     {
                         IsError = true;
-                        System.IO.StreamWriter s = System.IO.File.AppendText("c:\\dtrec.txt");
-                        s.Write(ex.ToString());
-                        s.Close();
                         return;
                     }
                 }
@@ -96,9 +76,7 @@ namespace DtRec
                 catch (System.Runtime.InteropServices.ExternalException ex)
                 {
                     IsError = true;
-                    System.IO.StreamWriter s = System.IO.File.AppendText("c:\\dtrec.txt");
-                    s.Write(ex.ToString());
-                    s.Close();
+					System.IO.File.AppendAllText(SavDir + "log.txt", ex.ToString());
                     return;
                 }
             }
