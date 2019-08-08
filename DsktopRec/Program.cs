@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
 
 namespace DtRec
 {
@@ -69,16 +70,37 @@ namespace DtRec
                         return;
                     }
                 }
-                try
-                {
-                    bmpScreenCapture.Save(SavDir + idx + ".bmp");
-                }
-                catch (System.Runtime.InteropServices.ExternalException ex)
-                {
-                    IsError = true;
-					System.IO.File.AppendAllText(SavDir + "log.txt", ex.ToString());
-                    return;
-                }
+				using(MemoryStream ms = new MemoryStream())
+				{
+					try
+					{
+						// Save to memory using the Jpeg format
+						bmpScreenCapture.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+					}
+					catch (System.Runtime.InteropServices.ExternalException ex)
+					{
+						IsError = true;
+						System.IO.File.AppendAllText(SavDir + "log.txt", ex.ToString());
+						return;
+					}
+					// read to end
+					byte[] bmpBytes = ms.GetBuffer();
+					try
+					{
+						System.IO.File.WriteAllBytes(SavDir + idx + ".jpg", bmpBytes);
+					}
+					catch(IOException)
+					{
+						IsError = true;
+						return;
+					}
+					catch(UnauthorizedAccessException)
+					{
+						IsError = true;
+						return;
+					}
+					ms.Close();
+				}
             }
         }
     }
