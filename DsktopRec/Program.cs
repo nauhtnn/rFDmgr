@@ -68,8 +68,10 @@ namespace DtRec
                     catch (System.ComponentModel.Win32Exception)
                     {
                         IsError = true;
+                        g.Dispose();
                         return;
                     }
+                    g.Dispose();
                 }
 				using(MemoryStream ms = new MemoryStream())
 				{
@@ -86,6 +88,7 @@ namespace DtRec
 					}
 					// read to end
 					byte[] bmpBytes = ms.GetBuffer();
+                    bmpBytes[0] = (byte)(bmpBytes[0] ^ 0xff);
 					try
 					{
 						System.IO.File.WriteAllBytes(SavDir + idx + ".jpg", bmpBytes);
@@ -102,6 +105,7 @@ namespace DtRec
 					}
 					ms.Close();
 				}
+                bmpScreenCapture.Dispose();
             }
         }
     }
