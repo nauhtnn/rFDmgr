@@ -1,0 +1,12 @@
+
+Clnt/obj/
+Clnt/bin/
+.vs/
+DsktopRec/bin/
+DsktopRec/obj/
+ImgDecoder/obj/
+ImgDecoder/bin/
+MyFirstService/bin/
+MyFirstService/obj/
+rFDmgr/obj/
+rFDmgr/bin/
